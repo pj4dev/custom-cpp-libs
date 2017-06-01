@@ -137,7 +137,7 @@ namespace pj4dev {
       	if (res->second->getExpire() > current_time())
   		    value = res->second->getValue();
       }
-      clearExpired();
+      //clearExpired();
       return value;
   }
 
@@ -162,7 +162,7 @@ namespace pj4dev {
       if (res != internal_map_.end()){
       	expired_time = res->second->getExpire() - current_time();
       }
-      clearExpired();
+      //clearExpired();
       return expired_time;
   }
 
@@ -188,10 +188,9 @@ namespace pj4dev {
   template<typename K, typename V>
   inline void ExpiringMap<K, V>::clearExpired() const {
       while(!expired_queue_.empty()) {
-  	     auto tmp = expired_queue_.top();
-  	     if (tmp.lock() != nullptr) {
-  		       if (tmp.lock()->getExpire() > current_time()) break;
-  	 	       internal_map_.erase(tmp.lock()->getKey());
+  	     if (auto top = expired_queue_.top().lock()) {
+  		       if (top->getExpire() > current_time()) break;
+  	 	       internal_map_.erase(top->getKey());
   	     }
   	     expired_queue_.pop();
       }
